@@ -1,0 +1,83 @@
+- name: Déploiement sur K3d
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  collections:
+    - kubernetes.core
+
+  tasks:
+    - name: Créer le Namespace
+      k8s:
+        name: demo-space
+        api_version: v1
+        kind: Namespace
+        state: present
+
+    - name: Créer le Deployment Nginx
+      k8s:
+        state: present
+        namespace: demo-space
+        definition:
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: nginx-deployment
+            labels:
+              app: my-nginx
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: my-nginx
+            template:
+              metadata:
+                labels:
+                  app: my-nginx
+              spec:
+                containers:
+                - name: nginx
+                  image: custom-nginx:v1
+                  imagePullPolicy: Never
+                  ports:
+                  - containerPort: 80
+
+    - name: Créer le Service (ClusterIP suffira avec un Ingress)
+      k8s:
+        state: present
+        namespace: demo-space
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: nginx-service
+          spec:
+            selector:
+              app: my-nginx
+            ports:
+              - protocol: TCP
+                port: 80        # MODIFIÉ : On utilise le port 80 standard
+                targetPort: 80
+
+    # NOUVEAU : Création de l'Ingress pour router le trafic
+    - name: Créer l'Ingress
+      k8s:
+        state: present
+        namespace: demo-space
+        definition:
+          apiVersion: networking.k8s.io/v1
+          kind: Ingress
+          metadata:
+            name: nginx-ingress
+            annotations:
+              ingress.kubernetes.io/ssl-redirect: "false"
+          spec:
+            rules:
+            - http:
+                paths:
+                - path: /
+                  pathType: Prefix
+                  backend:
+                    service:
+                      name: nginx-service
+                      port:
+                        number: 80
