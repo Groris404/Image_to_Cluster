@@ -1,9 +1,3 @@
-------------------------------------------------------------------------------------------------------
-ATELIER FROM IMAGE TO CLUSTER
-------------------------------------------------------------------------------------------------------
-L’idée en 30 secondes : Cet atelier consiste à **industrialiser le cycle de vie d’une application** simple en construisant une **image applicative Nginx** personnalisée avec **Packer**, puis en déployant automatiquement cette application sur un **cluster Kubernetes** léger (K3d) à l’aide d’**Ansible**, le tout dans un environnement reproductible via **GitHub Codespaces**.
-L’objectif est de comprendre comment des outils d’Infrastructure as Code permettent de passer d’un artefact applicatif maîtrisé à un déploiement cohérent et automatisé sur une plateforme d’exécution.
-  
 -------------------------------------------------------------------------------------------------------
 Séquence 1 : Codespace de Github
 -------------------------------------------------------------------------------------------------------
