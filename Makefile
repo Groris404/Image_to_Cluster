@@ -15,26 +15,15 @@ all: init-cluster build import deploy check
 #installation des dépendances !
 install-tools:
 	@echo "🔧 [0/5] Installation des dépendances système..."
-	# Correction de la clé Yarn (souvent bloquante sur Codespaces)
-	curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - || true
-	# Ajout repo Hashicorp (Packer)
-	curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-	sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main" -y
 	# Installation des paquets apt
+	sudo rm -f /etc/apt/sources.list.d/yarn.list
+	curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+	sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $$(lsb_release -cs) main" -y
 	sudo apt-get update
-	sudo apt-get install -y packer ansible python3-pip curl
-	# Installation lib Python K8s (nécessaire pour Ansible)
-	sudo pip3 install kubernetes openshift --break-system-packages
+	sudo apt-get install -y packer ansible python3-pip curl python3-kubernetes
 	# Installation K3d
 	@if ! command -v k3d >/dev/null; then curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash; fi
-	# Installation Kubectl
-	@if ! command -v kubectl >/dev/null; then \
-		curl -LO "https://dl.k8s.io/release/$(shell curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"; \
-		sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl; \
-		rm kubectl; \
-	fi
 
-# 1. Construit l'image avec Packer
 build:
 	@echo "Build de l'image Packer..."
 	packer init image.pkr.hcl
