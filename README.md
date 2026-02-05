@@ -10,3 +10,5 @@ Bonjour, vous venez de cloner mon repository. Pour que cela fonctionne, tapez si
 
 
 make install-tools all
+
+Quand le pop up "rendre public" apparaît en bas a droite de Codespaces, il faut bien cliquer dessus ! =) 
